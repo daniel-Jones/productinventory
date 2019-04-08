@@ -26,6 +26,9 @@
 #include <QSqlError>
 #include <QMessageBox>
 #include <QTableWidgetItem>
+#include <QSplitter>
+#include <QCheckBox>
+#include <QGridLayout>
 #include <QDebug>
 
 namespace Ui {
@@ -71,7 +74,9 @@ private:
 	int createTable(QString category); 		// create a table and add it to our tables list with a header, returns index in list or -1
 	QStringList headerLabels;			// labels used for table headers
 	QList<QLabel *> labels;				// labels used for table names
-
+	void resizeRows();				// resize all table rows to fit the content
+	QList<QCheckBox *> checkboxes;			// checkboxes used to filter product categories
+	QGridLayout *categoryLayout;			// layout
 };
 
 #endif // PRODUCTINVENTORY_H

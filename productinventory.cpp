@@ -45,6 +45,12 @@ ProductInventory::ProductInventory(QWidget *parent) :
 	headerLabels.append(QString("Brand"));
 	headerLabels.append(QString("Color"));
 	headerLabels.append(QString("Comment"));
+	headerLabels.append(QString("Images"));
+	headerLabels.append(QString("Date added"));
+	createTable("Connect to the database to populate the tables");
+
+	categoryLayout = new QGridLayout;
+	ui->filterCategoryScrollArea->setLayout(categoryLayout);
 }
 
 /*!
@@ -53,6 +59,7 @@ ProductInventory::ProductInventory(QWidget *parent) :
 ProductInventory::~ProductInventory()
 {
 	clearTables();
+	delete categoryLayout;
 	delete ui;
 }
 
@@ -140,11 +147,7 @@ ProductInventory::resizeEvent(QResizeEvent* event)
 {
 	QMainWindow::resizeEvent(event);
 	ui->tableWidget->resizeRowsToContents(); // not needed?
-	QList<QTableWidget *>::iterator i;
-	for (i = tables.begin(); i != tables.end(); i++)
-	{
-		(*i)->resizeRowsToContents();
-	}
+	resizeRows();
 }
 
 void ProductInventory::on_mustHaveImagesCheckBox_clicked()
@@ -199,7 +202,16 @@ ProductInventory::clearTables()
 	{
 		(*l)->hide();
 		labels.erase(l);
+		delete *l;
 	}
+
+	QList<QCheckBox *>::iterator c;
+	for (c = checkboxes.begin(); c != checkboxes.end(); c++)
+	{
+		checkboxes.erase(c);
+		delete *c;
+	}
+
 }
 
 /*!
@@ -213,7 +225,7 @@ ProductInventory::createTable(QString category)
 	if (table == nullptr)
 		return -1;
 	table->setMinimumHeight(100);
-	table->setColumnCount(3);
+	table->setColumnCount(headerLabels.size());
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	table->setHorizontalHeaderLabels(headerLabels);
 	table->verticalHeader()->hide();
@@ -227,4 +239,17 @@ ProductInventory::createTable(QString category)
 	ui->scrollArea->widget()->layout()->addWidget(table);
 	tables.append(table);
 	return tables.size()-1;
+}
+
+/*!
+ * resize each row in every table to fit its content
+ */
+void
+ProductInventory::resizeRows()
+{
+	QList<QTableWidget *>::iterator i;
+	for (i = tables.begin(); i != tables.end(); i++)
+	{
+		(*i)->resizeRowsToContents();
+	}
 }

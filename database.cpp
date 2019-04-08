@@ -43,6 +43,7 @@ ProductInventory::dbConnect()
 		return true;
 	}
 	qDebug() << "sql connection failed:" << db.lastError().text();
+	genericMessageBox(db.lastError().text(), "server error");
 	return false;
 }
 
@@ -100,6 +101,7 @@ ProductInventory::populateInterface()
 	if (query == nullptr)
 	{
 		qDebug() << "failed to populate interface";
+		return;
 	}
 	else
 	{
@@ -107,6 +109,13 @@ ProductInventory::populateInterface()
 		{
 			QString name = query->value(2).toString();
 			ui->filterCategoryComboBox->addItem(name);
+			QCheckBox *chk = new QCheckBox;
+			chk->setText(query->value(2).toString());
+			checkboxes.append(chk);
+			categoryLayout->addWidget(chk);
+
+			ui->filterCategoryScrollArea->setLayout(categoryLayout);
+			//ui->filterCategoryScrollArea->widget()->layout()->addWidget(chk);
 		}
 		delete query;
 	}
@@ -116,6 +125,7 @@ ProductInventory::populateInterface()
 	if (query == nullptr)
 	{
 		qDebug() << "failed to populate interface";
+		return;
 	}
 	else
 	{
@@ -129,7 +139,7 @@ ProductInventory::populateInterface()
 				return;
 
 			}
-			QSqlQuery *inner = genericQuery("SELECT brand, color, comment FROM product WHERE categoryid="+query->value(0).toString());
+			QSqlQuery *inner = genericQuery("SELECT brand, color, comment, DATE_FORMAT(dateAdded, \"%d-%m-%Y %h:%i %p\") FROM product WHERE deleted=0 AND categoryid="+query->value(0).toString());
 			if (inner == nullptr)
 			{
 				qDebug() << "failed to populate interface";
@@ -142,10 +152,13 @@ ProductInventory::populateInterface()
 				item.append(inner->value(0).toString());
 				item.append(inner->value(1).toString());
 				item.append(inner->value(2).toString());
+				item.append("images here");
+				item.append(inner->value(3).toString());
 				addItemToTable(tables.at(t), &item);
 			}
 			delete inner;
 		}
 		delete query;
+		resizeRows();
 	}
 }
