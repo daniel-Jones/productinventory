@@ -450,12 +450,25 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>mainTabs</tabstop>
   <tabstop>HostInput</tabstop>
   <tabstop>portInput</tabstop>
   <tabstop>usernameInput</tabstop>
   <tabstop>passwordInput</tabstop>
   <tabstop>databaseInput</tabstop>
+  <tabstop>imagesDirInput</tabstop>
   <tabstop>connectButton</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>includesTextBrandsInput</tabstop>
+  <tabstop>filterCategoryComboBox</tabstop>
+  <tabstop>includesTextProductsInput</tabstop>
+  <tabstop>filterCategoryScrollArea</tabstop>
+  <tabstop>mustHaveImagesCheckBox</tabstop>
+  <tabstop>newestFirstCheckBox</tabstop>
+  <tabstop>mustNotHaveImagesCheckBox</tabstop>
+  <tabstop>oldestFirstCheckBox</tabstop>
+  <tabstop>pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
