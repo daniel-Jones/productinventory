@@ -48,9 +48,6 @@ ProductInventory::ProductInventory(QWidget *parent) :
 	headerLabels.append(QString("Images"));
 	headerLabels.append(QString("Date added"));
 	createTable("Connect to the database to populate the tables");
-
-	categoryLayout = new QGridLayout;
-	ui->filterCategoryScrollArea->setLayout(categoryLayout);
 }
 
 /*!
@@ -59,7 +56,6 @@ ProductInventory::ProductInventory(QWidget *parent) :
 ProductInventory::~ProductInventory()
 {
 	clearTables();
-	delete categoryLayout;
 	delete ui;
 }
 
@@ -187,7 +183,7 @@ ProductInventory::addItemToTable(QTableWidget *table, QList<QString> *values)
 void
 ProductInventory::clearTables()
 {
-	qDebug() << "clearing table and deleting items";
+	qDebug() << "clearing tables and deleting items";
 	ui->tableWidget->setRowCount(0); // automagically deletes items
 	QList<QTableWidget *>::iterator i;
 	for (i = tables.begin(); i != tables.end(); i++)
@@ -224,7 +220,7 @@ ProductInventory::createTable(QString category)
 	QTableWidget *table = new QTableWidget;
 	if (table == nullptr)
 		return -1;
-	table->setMinimumHeight(100);
+	table->setMinimumHeight(200);
 	table->setColumnCount(headerLabels.size());
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	table->setHorizontalHeaderLabels(headerLabels);
@@ -252,4 +248,50 @@ ProductInventory::resizeRows()
 	{
 		(*i)->resizeRowsToContents();
 	}
+}
+
+void
+ProductInventory::on_selectAllButton_clicked()
+{
+	 QList<QCheckBox *>::iterator c;
+	for (c = checkboxes.begin(); c != checkboxes.end(); c++)
+	{
+		(*c)->setChecked(true);
+	}
+}
+
+void
+ProductInventory::on_unselectAllButton_clicked()
+{
+	 QList<QCheckBox *>::iterator c;
+	for (c = checkboxes.begin(); c != checkboxes.end(); c++)
+	{
+		(*c)->setChecked(false);
+	}
+
+}
+
+void
+ProductInventory::on_filterSortAlphabeticalCheckBox_clicked()
+{
+	ui->filterSortReverseAlphabeticalCheckBox->setChecked(false);
+}
+
+void
+ProductInventory::on_filterSortReverseAlphabeticalCheckBox_clicked()
+{
+
+	ui->filterSortAlphabeticalCheckBox->setChecked(false);
+}
+
+void
+ProductInventory::on_newestFirstCheckBox_clicked()
+{
+	ui->oldestFirstCheckBox->setChecked(false);
+}
+
+void
+ProductInventory::on_oldestFirstCheckBox_clicked()
+{
+	ui->newestFirstCheckBox->setChecked(false);
 }

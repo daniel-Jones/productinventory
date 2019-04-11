@@ -96,8 +96,8 @@ ProductInventory::genericQuery(QString query)
 void
 ProductInventory::populateInterface()
 {
-	ui->filterCategoryComboBox->clear();
-	QSqlQuery *query = genericQuery("SELECT * FROM category;");
+//	ui->filterCategoryComboBox->clear();
+	QSqlQuery *query = genericQuery("SELECT * FROM category ORDER BY name;");
 	if (query == nullptr)
 	{
 		qDebug() << "failed to populate interface";
@@ -105,17 +105,23 @@ ProductInventory::populateInterface()
 	}
 	else
 	{
+		int x = 0;
+		int y = 0;
 		while (query->next())
 		{
+			if (x >= 3)
+			{
+				y++;
+				x = 0;
+			}
+
 			QString name = query->value(2).toString();
-			ui->filterCategoryComboBox->addItem(name);
+			//ui->filterCategoryComboBox->addItem(name);
 			QCheckBox *chk = new QCheckBox;
 			chk->setText(query->value(2).toString());
 			checkboxes.append(chk);
-			categoryLayout->addWidget(chk);
-
-			ui->filterCategoryScrollArea->setLayout(categoryLayout);
-			//ui->filterCategoryScrollArea->widget()->layout()->addWidget(chk);
+			ui->filterCategoryGrid->addWidget(chk, y, x);
+			x++;
 		}
 		delete query;
 	}
@@ -139,7 +145,9 @@ ProductInventory::populateInterface()
 				return;
 
 			}
-			QSqlQuery *inner = genericQuery("SELECT brand, color, comment, DATE_FORMAT(dateAdded, \"%d-%m-%Y %h:%i %p\") FROM product WHERE deleted=0 AND categoryid="+query->value(0).toString());
+			QSqlQuery *inner = genericQuery("SELECT brand, color, comment, DATE_FORMAT(dateAdded, "
+							"\"%d-%m-%Y %h:%i %p\") FROM product WHERE deleted=0 AND categoryid="
+							+query->value(0).toString()+" ORDER BY brand DESC");
 			if (inner == nullptr)
 			{
 				qDebug() << "failed to populate interface";
@@ -156,9 +164,16 @@ ProductInventory::populateInterface()
 				item.append(inner->value(3).toString());
 				addItemToTable(tables.at(t), &item);
 			}
+			if (tables.at(t)->rowCount() == 0)
+			{
+				tables.at(t)->deleteLater();
+				tables.removeAt(t);
+				labels.at(t)->deleteLater();
+				labels.removeAt(t);
+			}
 			delete inner;
 		}
-		delete query;
-		resizeRows();
 	}
+	resizeRows();
+	delete query;
 }

@@ -28,7 +28,8 @@
 #include <QTableWidgetItem>
 #include <QSplitter>
 #include <QCheckBox>
-#include <QGridLayout>
+#include <QVBoxLayout>
+#include <qscrollbar.h>
 #include <QDebug>
 
 namespace Ui {
@@ -56,6 +57,26 @@ private slots:
 	void on_mustHaveImagesCheckBox_clicked();	// called when must have images filter selected
 	void on_mustNotHaveImagesCheckBox_clicked();	// called when must not have images filter selected
 
+	void on_selectAllButton_clicked();
+
+	void on_unselectAllButton_clicked();
+
+	void on_checkBox_2_clicked();
+
+	void on_filterSortAlphaCheckBox_clicked();
+
+	void on_filterSortRevAlphaCheckBox_clicked();
+
+	void on_filterSortAlphabeticalCheckBox_clicked();
+
+	void on_filterSortReverseAlphabeticalCheckbox_clicked();
+
+	void on_filterSortReverseAlphabeticalCheckBox_clicked();
+
+	void on_newestFirstCheckBox_clicked();
+
+	void on_oldestFirstCheckBox_clicked();
+
 private:
 	Ui::ProductInventory *ui;
 	QString conStatus; 				// connection status text
@@ -76,7 +97,6 @@ private:
 	QList<QLabel *> labels;				// labels used for table names
 	void resizeRows();				// resize all table rows to fit the content
 	QList<QCheckBox *> checkboxes;			// checkboxes used to filter product categories
-	QGridLayout *categoryLayout;			// layout
 };
 
 #endif // PRODUCTINVENTORY_H
