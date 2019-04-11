@@ -61,15 +61,7 @@ private slots:
 
 	void on_unselectAllButton_clicked();
 
-	void on_checkBox_2_clicked();
-
-	void on_filterSortAlphaCheckBox_clicked();
-
-	void on_filterSortRevAlphaCheckBox_clicked();
-
 	void on_filterSortAlphabeticalCheckBox_clicked();
-
-	void on_filterSortReverseAlphabeticalCheckbox_clicked();
 
 	void on_filterSortReverseAlphabeticalCheckBox_clicked();
 
