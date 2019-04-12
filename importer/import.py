@@ -34,6 +34,7 @@ def truncateTables(toDBCursor):
 	toDBCursor.execute("SET FOREIGN_KEY_CHECKS = 0;");
 	toDBCursor.execute("TRUNCATE TABLE category");
 	toDBCursor.execute("TRUNCATE TABLE product");
+	toDBCursor.execute("TRUNCATE TABLE productimage");
 	toDBCursor.execute("SET FOREIGN_KEY_CHECKS = 1;");
 
 
@@ -44,42 +45,70 @@ def createCategories(toDBCursor):
 		toDBCursor.execute("INSERT INTO category (isactive, name) VALUES(1, \"{}\");".format(i));
 
 def importData(fromDBCursor, toDBCursor):
-	'''
-	how this works:
-	get every category from our todatabase
-	loop through each product in fromdb
-	where fromdb category name matches todb category name, add product
-	after, everything not in one of them is added to the "tests" category
-	'''
 	print("importing data");
 	toDBCursor.execute("SET FOREIGN_KEY_CHECKS = 0;");
 	toDBCursor.execute("SELECT categoryid, name FROM category;");
 	fromDBCursor.execute("SELECT * from products;");
 	todb = toDBCursor.fetchall();
 	fromdb = fromDBCursor.fetchall();
+	# ok so, i no longer care about this script being nice
+	toDBCursor.execute("ALTER TABLE product DROP COLUMN IF EXISTS img;");
+	toDBCursor.execute("ALTER TABLE product ADD COLUMN img tinytext;");
 	for t in todb:
 		print("trying {}".format(t[1]));
 		for f in fromdb:
 			if f[3] == t[1]:
 				print("{} == {}".format(f, t));
-				toDBCursor.execute("INSERT INTO product "
+				try:
+					print(f);
+					image = f[7].decode().split("\"")[1];
+					toDBCursor.execute("INSERT INTO product "
+					"(categoryid, comment, brand, color, "
+					"dateadded, deleted, img) VALUES "
+					"({}, \"{}\", \"{}\", \"{}\", FROM_UNIXTIME({}), {}, \"{}\");"
+					.format(t[0], f[6], f[4], f[5], f[1], f[2], image));
+
+				except IndexError:
+					print("no image");
+					print(t);
+					print(f);
+					toDBCursor.execute("INSERT INTO product "
 						   "(categoryid, comment, brand, color, "
 						   "dateadded, deleted) VALUES "
 						   "({}, \"{}\", \"{}\", \"{}\", FROM_UNIXTIME({}), {});"
 						   .format(t[0], f[6], f[4], f[5], f[1], f[2]));
+
+
 				# in our current database we only have 1 image per product
 				# so a hack like this will work....
+				'''
 				try:
 					image = f[7].decode().split("\"")[1];
 					print(image);
+					print(t);
 					print("adding {} to productid {}".format(image, t[0]));
-					toDBCursor.execute("INSERT INTO productimage "
+					toDBCursor.execute("INSERT INTO productimage (productid, imagename, dateadded)"
 							   "VALUES({}, \"{}\", FROM_UNIXTIME({}))".format
-							   (t[0], image, f[1]));
+							   (t[0], image, f[1], f[7]));
 				except IndexError:
 					print("no image");
+				'''
 
 	toDBCursor.execute("SET FOREIGN_KEY_CHECKS = 1;");
+
+def insertImages(toDBCursor):
+	toDBCursor.execute("SELECT productid, img, dateadded FROM product;");
+	res = toDBCursor.fetchall();
+	for t in res:
+		if t[1] is not None:
+			print(t[2]);
+			print("INSERT INTO productimage (productid, imagename, dateadded) "
+					    "VALUES ({}, {}, \"{}\");".format(t[0], t[1], t[2]));
+			toDBCursor.execute("INSERT INTO productimage (productid, imagename, dateadded) "
+					    "VALUES ({}, \"{}\", \"{}\");".format(t[0], t[1], t[2]));
+
+	toDBCursor.execute("ALTER TABLE product DROP COLUMN IF EXISTS img;");
+
 def main():
 	resp = input("Running this script will REMOVE ALL DATABASE ENTRIES in the toDB database, continue? (Y/N): ");
 	if resp.upper() != 'Y':
@@ -104,6 +133,8 @@ def main():
 	createCategories(toDBCursor);
 	
 	importData(fromDBCursor, toDBCursor);
+	
+	insertImages(toDBCursor);
 
 	toDB.commit();
 
